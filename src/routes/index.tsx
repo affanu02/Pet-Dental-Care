@@ -7,7 +7,8 @@ import schnauzerXray from "@/assets/schnauzer-radiograph.jpg.asset.json";
 import annotated from "@/assets/annotated-comparison.jpg.asset.json";
 import brushing from "@/assets/toothbrushing.jpg.asset.json";
 import warningSigns from "@/assets/warning-signs.jpg.asset.json";
-import tartarGums from "@/assets/tartar-gums.jpg.asset.json";
+import tartarBuildup from "@/assets/tartar-buildup.jpg.asset.json";
+import healthyTeeth from "@/assets/healthy-teeth.jpg.asset.json";
 import catXray from "@/assets/cat-radiography.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -99,16 +100,6 @@ function Figure({ src, alt, label, credit, children }: { src: string; alt: strin
         </p>
       </figcaption>
     </figure>
-  );
-}
-
-function Placeholder({ label, note }: { label: string; note: string }) {
-  return (
-    <div role="img" aria-label={`Image placeholder: ${label}`} className="flex aspect-[4/3] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-sage bg-muted p-6 text-center">
-      <p className="font-bold">Image placeholder</p>
-      <p className="mt-1 font-display text-lg">{label}</p>
-      <p className="mt-2 text-sm text-muted-foreground">{note}</p>
-    </div>
   );
 }
 
@@ -259,11 +250,14 @@ function Index() {
           intro={<p>If you notice any of these signs, bring your pet to the vet. Remember: many problems sit below the gumline, so clean-looking teeth don't always mean a healthy mouth.</p>}>
           <div className="grid gap-8 md:grid-cols-2">
             <Reveal>
-              <Placeholder label="Healthy-looking teeth and gums" note="No healthy-mouth photo was included in the source document. Add a credited image here." />
+              <Figure src={healthyTeeth.url} label="Healthy-looking teeth and gums" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
+                alt="Close-up of a dog's mouth after a professional dental cleaning, with clean scaled teeth and healthy pink gums">
+                The same mouth after a professional cleaning — clean teeth and healthy gums.
+              </Figure>
             </Reveal>
             <Reveal>
-              <Figure src={tartarGums.url} label="Warning signs" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
-                alt="Close-up of a dog's mouth showing yellow-brown tartar on the teeth and red, inflamed gums">
+              <Figure src={tartarBuildup.url} label="Warning signs" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
+                alt="Close-up of a dog's mouth showing thick yellow-brown tartar on the teeth and red, inflamed gums">
                 Tartar buildup and red, inflamed gums.
               </Figure>
             </Reveal>
