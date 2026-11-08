@@ -1,23 +1,398 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import normalXray from "@/assets/normal-radiograph.jpg.asset.json";
+import boneLossXray from "@/assets/bone-loss-radiograph.jpg.asset.json";
+import schnauzerMouth from "@/assets/schnauzer-mouth.jpg.asset.json";
+import schnauzerXray from "@/assets/schnauzer-radiograph.jpg.asset.json";
+import annotated from "@/assets/annotated-comparison.jpg.asset.json";
+import brushing from "@/assets/toothbrushing.jpg.asset.json";
+import warningSigns from "@/assets/warning-signs.jpg.asset.json";
+import tartarGums from "@/assets/tartar-gums.jpg.asset.json";
+import catXray from "@/assets/cat-radiography.jpg.asset.json";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Pet Dental Care — A guide for dog and cat owners" },
+      {
+        name: "description",
+        content:
+          "Why oral care matters for dogs and cats, warning signs to look for, how dental disease progresses, and how home care helps.",
+      },
+      { property: "og:title", content: "Pet Dental Care — A guide for dog and cat owners" },
+      {
+        property: "og:description",
+        content: "Warning signs, stages of dental disease, what happens at the clinic, and home care for pets.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
+const NAV = [
+  ["why", "Why it matters"],
+  ["signs", "Warning signs"],
+  ["stages", "Stages"],
+  ["clinic", "At the clinic"],
+  ["home", "Home care"],
+  ["sources", "Sources"],
+] as const;
+
+function Reveal({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          el.classList.add("is-visible");
+          io.disconnect();
+        }
+      },
+      { threshold: 0.12 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={`reveal ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function Section({ id, eyebrow, title, intro, children, tone = "" }: {
+  id: string; eyebrow: string; title: string; intro?: ReactNode; children: ReactNode; tone?: string;
+}) {
+  return (
+    <section id={id} className={`px-5 py-20 md:py-28 ${tone}`} aria-labelledby={`${id}-h`}>
+      <div className="mx-auto max-w-6xl">
+        <Reveal className="max-w-2xl">
+          <p className="text-sm font-bold uppercase tracking-widest text-accent">{eyebrow}</p>
+          <h2 id={`${id}-h`} className="mt-2 text-3xl md:text-4xl">{title}</h2>
+          {intro && <div className="mt-4 text-lg leading-relaxed text-muted-foreground">{intro}</div>}
+        </Reveal>
+        <div className="mt-12">{children}</div>
+      </div>
+    </section>
+  );
+}
+
+function Figure({ src, alt, label, credit, children }: { src: string; alt: string; label?: string; credit: string; children?: ReactNode }) {
+  return (
+    <figure className="overflow-hidden rounded-2xl border bg-card shadow-soft">
+      <div className="relative">
+        <img src={src} alt={alt} loading="lazy" className="block h-auto w-full" />
+        {label && (
+          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">
+            {label}
+          </span>
+        )}
+      </div>
+      <figcaption className="space-y-2 p-4 text-sm">
+        {children && <div className="leading-relaxed text-foreground">{children}</div>}
+        <p className="break-words text-muted-foreground">
+          Image source: <a className="underline underline-offset-2 hover:text-accent" href={credit} target="_blank" rel="noreferrer">{credit}</a>
+        </p>
+      </figcaption>
+    </figure>
+  );
+}
+
+function Placeholder({ label, note }: { label: string; note: string }) {
+  return (
+    <div role="img" aria-label={`Image placeholder: ${label}`} className="flex aspect-[4/3] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-sage bg-muted p-6 text-center">
+      <p className="font-bold">Image placeholder</p>
+      <p className="mt-1 font-display text-lg">{label}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{note}</p>
+    </div>
+  );
+}
+
+function Compare() {
+  const [pos, setPos] = useState(50);
+  const id = useId();
+  return (
+    <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
+      <div className="relative select-none" style={{ aspectRatio: "1320 / 743" }}>
+        <img src={schnauzerXray.url} alt="Dental radiograph of the same dog showing massive, widespread bone loss around the tooth roots" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
+          <img src={schnauzerMouth.url} alt="Photo of a miniature Schnauzer's mouth with clean-looking tooth crowns" className="h-full w-full object-cover" />
+        </div>
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 w-1 -translate-x-1/2 bg-primary-foreground shadow-soft" style={{ left: `${pos}%` }} />
+        <span className="absolute left-3 bottom-3 rounded-full bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">What you see</span>
+        <span className="absolute right-3 bottom-3 rounded-full bg-accent px-3 py-1 text-sm font-bold text-accent-foreground">What an X-ray reveals</span>
+      </div>
+      <div className="p-4">
+        <label htmlFor={id} className="text-sm font-semibold">Drag to compare the photo and the X-ray</label>
+        <input id={id} type="range" min={0} max={100} value={pos} onChange={(e) => setPos(Number(e.target.value))} className="mt-2 w-full accent-accent" />
+        <p className="mt-3 text-sm leading-relaxed">
+          This mini-Schnauzer's owner was brushing the teeth twice daily and so the crowns are really nice and clean. However, the dog had never had a proper dental assessment, and there was widespread periodontal disease (massive bone loss evident on this radiograph). She required extraction of every tooth. Do not let clean crowns lull you into a false sense of security.
+        </p>
+        <p className="mt-2 break-words text-sm text-muted-foreground">
+          Image source: <a className="underline" href="https://vetdentedu.ca/2023/04/20/tooth-brushing-can-be-bad/" target="_blank" rel="noreferrer">https://vetdentedu.ca/2023/04/20/tooth-brushing-can-be-bad/</a>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+const STAGES = [
+  { n: 1, name: "Gingivitis", tag: "Reversible", short: "Inflammation of the gums — redness, swelling and possible bleeding.",
+    more: "There is no attachment loss. This stage is reversible with proper professional dental cleaning and consistent oral home care." },
+  { n: 2, name: "Early periodontitis", tag: "Irreversible damage begins", short: "Inflammation has progressed under the gumline.",
+    more: "Less than 25% attachment loss. Early periodontal pockets are formed and mild bone loss may happen. Treatment includes scaling, polishing and subgingival scaling or locally applied antimicrobials." },
+  { n: 3, name: "Established periodontitis", tag: "Irreversible", short: "Significant damage to the supporting structures of the teeth.",
+    more: "25–50% attachment loss. There are deeper periodontal pockets, gingival recession, bone loss and possible tooth mobility." },
+  { n: 4, name: "Advanced periodontitis", tag: "Irreversible", short: "Severe destruction of the supporting tissues.",
+    more: "Greater than 50% periodontal attachment loss. Teeth may become extremely loose, and issues like infections and extensive bone loss may occur." },
+];
+
+function StageCard({ s }: { s: (typeof STAGES)[number] }) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  const reversible = s.n === 1;
+  return (
+    <div className="flex flex-col rounded-2xl border bg-card p-6 shadow-soft transition-transform hover:-translate-y-1">
+      <span className={`self-start rounded-full px-3 py-1 text-xs font-bold ${reversible ? "bg-sage text-foreground" : "bg-rose text-foreground"}`}>{s.tag}</span>
+      <p className="mt-4 text-sm font-bold text-accent">Stage {s.n}</p>
+      <h3 className="text-xl">{s.name}</h3>
+      <p className="mt-2 leading-relaxed text-muted-foreground">{s.short}</p>
+      <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}
+        className="mt-auto pt-4 text-left font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring">
+        {open ? "Show less −" : "Learn more +"}
+      </button>
+      <div id={id} hidden={!open} className="mt-3 border-t pt-3 text-sm leading-relaxed">{s.more}</div>
+    </div>
+  );
+}
+
+const STEPS = [
+  ["Awake oral exam", "The vet examines the mouth while your pet is awake for visible abnormalities — teeth, gums, tongue, lips and bite. This is only a preliminary assessment: some problems cannot be fully evaluated without general anesthesia, periodontal probing and dental radiographs."],
+  ["Dental radiographs under general anesthesia", "Full-mouth X-rays evaluate the tooth roots, supporting bone and abnormalities under the gumline that can't be seen during a visual exam. Anesthesia allows accurate positioning, prevents movement, and keeps your pet comfortable and the team safe."],
+  ["Cleaning above and below the gumline", "Plaque and calculus are removed from the teeth above and below the gumline using hand instruments and ultrasonic scalers."],
+  ["Polishing", "Polishing smooths the enamel surface and reduces scratches that encourage plaque buildup."],
+  ["Assessment and treatment", "Each tooth is probed to assess pocket depths and attachment loss. Based on the findings, the vet discusses a treatment plan with you — such as periodontal therapy or extractions — before treatment begins."],
+  ["Recovery", "Your pet is monitored as they recover from anesthesia after the procedure."],
+  ["Home-care instructions", "You receive instructions on maintaining your pet's oral health with regular toothbrushing, dental products, or preventative care."],
+];
+
+const SOURCES = [
+  "https://vetster.com/en/wellness/why-dental-hygiene-and-oral-health-are-important-for-pets",
+  "https://veterinarypartner.vin.com/default.aspx?pid=19239&id=4951294",
+  "https://vetmed.tamu.edu/news/pet-talk/why-pet-dental-care-is-important/",
+  "https://leovets.ca/blog/home-dental-care-for-dogs-cats-building-habits-that-last-a-lifetime/",
+  "https://www.greencrossvets.com.au/pet-library/articles-of-interest/dental-home-care/",
+  "https://vohc.org/history/",
+];
+const IMAGE_CREDITS = [
+  ["Normal canine dental radiograph", "https://vetdentedu.ca/2023/01/02/normal-canine-dental-radiographs/"],
+  ["Radiograph showing bone loss", "https://veterinarydentistry.net/periodontal-disease-dogs/"],
+  ["Mini-Schnauzer photo and radiograph", "https://vetdentedu.ca/2023/04/20/tooth-brushing-can-be-bad/"],
+  ["Annotated outside vs. X-ray comparison", "https://yongesheppardvets.ca/anesthesia-free-vs-cohat/"],
+  ["Toothbrushing a dog", "https://www.dahnc.com/articles/pet-dental-care-tips-to-manage-your-pets-oral-health"],
+  ["7 key signs of dental disease", "https://mustcarevets.com.au/blogs/dental/spotting-trouble-early-7-signs-of-dental-disease-in-dogs/"],
+  ["Tartar and inflamed gums", "https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"],
+  ["Cat having dental radiographs", "https://www.mcqueenanimalhospital.com/digital-dental-pet-radiography-brampton/"],
+];
+
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background text-foreground">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-primary focus:p-2 focus:text-primary-foreground">Skip to content</a>
+      <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
+        <nav aria-label="Main" className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-auto px-5 py-3">
+          <a href="#top" className="shrink-0 font-display text-lg font-semibold text-primary">Pet Dental Care</a>
+          <ul className="ml-auto flex shrink-0 gap-5 text-sm font-semibold">
+            {NAV.map(([id, label]) => (
+              <li key={id}><a href={`#${id}`} className="whitespace-nowrap text-muted-foreground transition-colors hover:text-accent">{label}</a></li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+
+      <main id="main">
+        <section id="top" className="relative overflow-hidden px-5 pb-20 pt-16 md:pt-24">
+          <div aria-hidden className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-secondary opacity-60 blur-3xl" />
+          <div aria-hidden className="absolute -bottom-40 -left-20 h-80 w-80 rounded-full bg-sage opacity-40 blur-3xl" />
+          <div className="relative mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
+            <Reveal>
+              <p className="text-sm font-bold uppercase tracking-widest text-accent">A guide for dog & cat owners</p>
+              <h1 className="mt-3 text-5xl leading-tight md:text-6xl">Pet Dental Care</h1>
+              <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">
+                Dental disease can cause pain, infections, and long-term damage to your pet's teeth. Regular veterinary exams and daily home care help keep your pet comfortable, healthy, and happy.
+              </p>
+              <a href="#signs" className="mt-8 inline-flex rounded-full bg-primary px-7 py-3 font-bold text-primary-foreground shadow-soft transition hover:-translate-y-0.5 hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+                See the warning signs ↓
+              </a>
+            </Reveal>
+            <Reveal>
+              <img src={brushing.url} alt="A veterinary team member gently brushing a golden dog's teeth with a small toothbrush" className="w-full rounded-3xl shadow-soft" />
+              <p className="mt-2 break-words text-xs text-muted-foreground">Image source: <a className="underline" href="https://www.dahnc.com/articles/pet-dental-care-tips-to-manage-your-pets-oral-health" target="_blank" rel="noreferrer">dahnc.com</a></p>
+            </Reveal>
+          </div>
+        </section>
+
+        <Section id="why" eyebrow="Why it matters" title="Why is oral care so important for your pet?" tone="bg-muted">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Plaque", "Poor oral hygiene allows bacterial plaque buildup on the teeth and along the gumline. Not regularly removing it can lead to gum inflammation."],
+              ["Periodontal disease", "One of the most common dental conditions in pets. Left untreated, it can cause gum recession, bone destruction, tooth mobility, and eventually tooth loss."],
+              ["Pain", "Many animals can still continue to eat despite experiencing discomfort, making it challenging for owners to recognize dental problems without a thorough oral examination."],
+              ["Quality of life", "Poor oral health can cause issues with chewing, decreased appetite, excessive drooling, bad breath, and behavioural changes related to oral pain."],
+            ].map(([t, d]) => (
+              <Reveal key={t} className="h-full">
+                <div className="h-full rounded-2xl border bg-card p-6 shadow-soft transition-transform hover:-translate-y-1">
+                  <div className="h-1.5 w-10 rounded-full bg-rose" />
+                  <h3 className="mt-4 text-xl">{t}</h3>
+                  <p className="mt-2 leading-relaxed text-muted-foreground">{d}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Section>
+
+        <Section id="signs" eyebrow="What to look for" title="Normal or a warning sign?"
+          intro={<p>If you notice any of these signs, bring your pet to the vet. Remember: many problems sit below the gumline, so clean-looking teeth don't always mean a healthy mouth.</p>}>
+          <div className="grid gap-8 md:grid-cols-2">
+            <Reveal>
+              <Placeholder label="Healthy-looking teeth and gums" note="No healthy-mouth photo was included in the source document. Add a credited image here." />
+            </Reveal>
+            <Reveal>
+              <Figure src={tartarGums.url} label="Warning signs" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
+                alt="Close-up of a dog's mouth showing yellow-brown tartar on the teeth and red, inflamed gums">
+                Tartar buildup and red, inflamed gums.
+              </Figure>
+            </Reveal>
+          </div>
+          <Reveal className="mt-8">
+            <Figure src={warningSigns.url} credit="https://mustcarevets.com.au/blogs/dental/spotting-trouble-early-7-signs-of-dental-disease-in-dogs/"
+              alt="Infographic of 7 key signs of dental disease: reluctance to chew or dropping food, red swollen or bleeding gums, persistent bad breath, pawing at the mouth, yellow or brown tartar, excessive drooling or blood, and loose or missing teeth">
+              7 key signs: reluctance to chew or dropping food, red swollen or bleeding gums, persistent bad breath, pawing at the mouth, yellow or brown tartar, excessive drooling or blood, and loose or missing teeth.
+            </Figure>
+          </Reveal>
+
+          <Reveal className="mt-20 max-w-2xl">
+            <h3 className="text-2xl md:text-3xl">What an X-ray can show</h3>
+            <p className="mt-3 leading-relaxed text-muted-foreground">These radiographs are from two different patients — not a before and after.</p>
+          </Reveal>
+          <div className="mt-8 grid gap-8 md:grid-cols-2">
+            <Reveal>
+              <Figure src={normalXray.url} label="Normal radiograph" credit="https://vetdentedu.ca/2023/01/02/normal-canine-dental-radiographs/"
+                alt="Normal canine dental radiograph of the lower jaw with numbered teeth and bone surrounding the roots" />
+            </Reveal>
+            <Reveal>
+              <Figure src={boneLossXray.url} label="Bone loss" credit="https://veterinarydentistry.net/periodontal-disease-dogs/"
+                alt="Dental radiograph showing a furcation defect and vertical bone loss around a lower premolar in a dog">
+                A furcation defect and vertical bone loss next to the left lower 4th premolar in a dog.
+              </Figure>
+            </Reveal>
+          </div>
+
+          <Reveal className="mt-20 max-w-2xl">
+            <h3 className="text-2xl md:text-3xl">What you see vs. what an X-ray reveals</h3>
+            <p className="mt-3 leading-relaxed text-muted-foreground">Same dog, same teeth. Serious disease can hide below the gumline.</p>
+          </Reveal>
+          <div className="mt-8 grid gap-8 lg:grid-cols-[3fr_2fr]">
+            <Reveal><Compare /></Reveal>
+            <Reveal>
+              <Figure src={annotated.url} credit="https://yongesheppardvets.ca/anesthesia-free-vs-cohat/"
+                alt="Side-by-side photo and X-ray of one dog, with red arrows marking teeth that needed extraction and lines showing where bone should be versus where it actually is">
+                Beautiful on the outside, severely diseased on the inside. Blue line = where the bone should be; red line = the actual bone level. Red arrows mark teeth that needed extraction.
+              </Figure>
+            </Reveal>
+          </div>
+        </Section>
+
+        <Section id="stages" eyebrow="How it progresses" title="The 4 stages of dental disease" tone="bg-muted"
+          intro={<p>Disease starts with gingivitis, caused by plaque along the gumline. <strong className="text-foreground">Gingivitis is reversible</strong> with proper treatment and consistent oral hygiene. Once it becomes periodontitis, the damage is <strong className="text-foreground">irreversible</strong> — but treatment can help control it.</p>}>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {STAGES.map((s) => <Reveal key={s.n} className="h-full"><StageCard s={s} /></Reveal>)}
+          </div>
+        </Section>
+
+        <Section id="clinic" eyebrow="At the clinic" title="What happens during a dental visit?"
+          intro={<p>An awake exam is a helpful first step, but it's only preliminary. Dental radiographs reveal problems below the gumline — in one study, 28% of normal-looking dogs and 42% of cats had important abnormalities visible only on X-rays.</p>}>
+          <div className="grid gap-10 lg:grid-cols-[3fr_2fr]">
+            <ol className="space-y-4">
+              {STEPS.map(([t, d], i) => (
+                <Reveal key={t}>
+                  <li className="flex gap-4 rounded-2xl border bg-card p-5 transition-shadow hover:shadow-soft">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary font-display font-semibold text-secondary-foreground">{i + 1}</span>
+                    <div>
+                      <h3 className="text-lg">{t}</h3>
+                      <p className="mt-1 leading-relaxed text-muted-foreground">{d}</p>
+                    </div>
+                  </li>
+                </Reveal>
+              ))}
+            </ol>
+            <Reveal className="lg:sticky lg:top-24 lg:self-start">
+              <Figure src={catXray.url} credit="https://www.mcqueenanimalhospital.com/digital-dental-pet-radiography-brampton/"
+                alt="A calico cat under general anesthesia with a breathing tube, positioned for dental radiographs">
+                Dental radiographs are taken under general anesthesia.
+              </Figure>
+            </Reveal>
+          </div>
+        </Section>
+
+        <Section id="home" eyebrow="Home care" title="Caring for teeth at home" tone="bg-muted"
+          intro={<p>Professional cleanings should ideally happen at least once a year, while home care should be practiced daily to help prevent or slow dental disease and extend the benefits of professional treatment.</p>}>
+          <div className="grid gap-6 md:grid-cols-2">
+            <Reveal className="h-full">
+              <div className="h-full rounded-2xl border bg-card p-8 shadow-soft">
+                <span className="rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">Active care</span>
+                <h3 className="mt-4 text-2xl">Toothbrushing</h3>
+                <p className="mt-3 leading-relaxed text-muted-foreground">The owner directly cares for the pet's oral health. Toothbrushing mechanically removes plaque from the teeth before it mineralizes and becomes hardened dental calculus.</p>
+              </div>
+            </Reveal>
+            <Reveal className="h-full">
+              <div className="h-full rounded-2xl border bg-card p-8 shadow-soft">
+                <span className="rounded-full bg-sage px-3 py-1 text-xs font-bold text-foreground">Passive care</span>
+                <h3 className="mt-4 text-2xl">Diets, chews & water additives</h3>
+                <p className="mt-3 leading-relaxed text-muted-foreground">The pet contributes to its own oral health through chewing, eating, and drinking — useful when a pet doesn't tolerate brushing. Examples include specialized oral health diets, dental chews, chew toys, and water additives.</p>
+              </div>
+            </Reveal>
+          </div>
+          <Reveal className="mt-8">
+            <div className="grid items-center gap-6 rounded-2xl border bg-card p-8 shadow-soft md:grid-cols-[200px_1fr]">
+              <div role="img" aria-label="Image placeholder: VOHC Seal of Acceptance" className="flex aspect-square flex-col items-center justify-center rounded-full border-2 border-dashed border-sage bg-muted p-4 text-center text-xs">
+                <span className="font-bold">Image placeholder</span>
+                <span className="mt-1 font-display text-base">VOHC Seal of Acceptance</span>
+              </div>
+              <div>
+                <h3 className="text-2xl">Look for the VOHC seal</h3>
+                <p className="mt-3 leading-relaxed text-muted-foreground">The Veterinary Oral Health Council (VOHC) is made up of veterinary dental specialists who evaluate oral health products based on scientific evidence. Products that meet its requirements receive a seal of acceptance, and VOHC provides an online list of approved products. Home care works alongside — not instead of — professional dental care.</p>
+                <a href="https://vohc.org/" target="_blank" rel="noreferrer" className="mt-4 inline-block font-semibold text-primary underline underline-offset-4 hover:text-accent">Visit vohc.org</a>
+              </div>
+            </div>
+          </Reveal>
+        </Section>
+
+        <Section id="sources" eyebrow="References" title="Sources and image credits">
+          <div className="grid gap-10 md:grid-cols-2">
+            <div>
+              <h3 className="text-xl">Sources</h3>
+              <ul className="mt-4 space-y-2 text-sm">
+                {SOURCES.map((s) => <li key={s} className="break-words"><a href={s} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-accent">{s}</a></li>)}
+                <li>AAHA (2019). Dental Care Guidelines for Dogs and Cats.</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xl">Image credits</h3>
+              <ul className="mt-4 space-y-2 text-sm">
+                {IMAGE_CREDITS.map(([t, u]) => <li key={u} className="break-words"><span className="font-semibold">{t}:</span> <a href={u} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-accent">{u}</a></li>)}
+              </ul>
+            </div>
+          </div>
+        </Section>
+      </main>
+      <footer className="border-t px-5 py-8 text-center text-sm text-muted-foreground">
+        This guide is for education only. Talk to your veterinarian about your pet's dental health.
+      </footer>
     </div>
   );
 }
