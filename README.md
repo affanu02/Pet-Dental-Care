@@ -1,24 +1,25 @@
 # Pet Dental Care
 
-Implement exactly the screenshot and nothing else
-
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/eacd1f1d-3d6b-4bbb-a586-beb311ee5ebe).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+A friendly guide to dental care for dogs and cats.
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+You need Node.js and Bun installed.
 
 ```sh
 git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+cd Pet-Dental-Care
+bun install
+bun run dev
+```
+
+The local development server is available at `http://localhost:3000`.
+
+Useful commands:
+
+```sh
+bun run build
+bun run preview
+bun run lint
+bun run test
 ```

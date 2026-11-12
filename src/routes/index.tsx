@@ -1,15 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import normalXray from "@/assets/normal-radiograph.jpg.asset.json";
-import boneLossXray from "@/assets/bone-loss-radiograph.jpg.asset.json";
-import schnauzerMouth from "@/assets/schnauzer-mouth.jpg.asset.json";
-import schnauzerXray from "@/assets/schnauzer-radiograph.jpg.asset.json";
-import annotated from "@/assets/annotated-comparison.jpg.asset.json";
-import brushing from "@/assets/toothbrushing.jpg.asset.json";
-import warningSigns from "@/assets/warning-signs.jpg.asset.json";
-import tartarBuildup from "@/assets/tartar-buildup.jpg.asset.json";
-import healthyTeeth from "@/assets/healthy-teeth.jpg.asset.json";
-import catXray from "@/assets/cat-radiography.jpg.asset.json";
+import normalXray from "@/assets/normal-radiograph.jpg";
+import boneLossXray from "@/assets/bone-loss-radiograph.jpg";
+import annotated from "@/assets/annotated-comparison.jpg";
+import brushing from "@/assets/toothbrushing.jpg";
+import warningSigns from "@/assets/warning-signs.jpg";
+import tartarBuildup from "@/assets/tartar-buildup.jpg";
+import healthyTeeth from "@/assets/healthy-teeth.jpg";
+import catXray from "@/assets/cat-radiography.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -86,7 +84,7 @@ function Figure({ src, alt, label, credit, children }: { src: string; alt: strin
   return (
     <figure className="overflow-hidden rounded-2xl border bg-card shadow-soft">
       <div className="relative">
-        <img src={src} alt={alt} loading="lazy" className="block h-auto w-full" />
+        <img src={src} alt={alt} loading="lazy" className="mx-auto block h-auto w-auto max-w-full" />
         {label && (
           <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">
             {label}
@@ -103,43 +101,23 @@ function Figure({ src, alt, label, credit, children }: { src: string; alt: strin
   );
 }
 
-function Compare() {
-  const [pos, setPos] = useState(50);
-  const id = useId();
-  return (
-    <div className="overflow-hidden rounded-2xl border bg-card shadow-soft">
-      <div className="relative select-none" style={{ aspectRatio: "1320 / 743" }}>
-        <img src={schnauzerXray.url} alt="Dental radiograph of the same dog showing massive, widespread bone loss around the tooth roots" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
-          <img src={schnauzerMouth.url} alt="Photo of a miniature Schnauzer's mouth with clean-looking tooth crowns" className="h-full w-full object-cover" />
-        </div>
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 w-1 -translate-x-1/2 bg-primary-foreground shadow-soft" style={{ left: `${pos}%` }} />
-        <span className="absolute left-3 bottom-3 rounded-full bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">What you see</span>
-        <span className="absolute right-3 bottom-3 rounded-full bg-accent px-3 py-1 text-sm font-bold text-accent-foreground">What an X-ray reveals</span>
-      </div>
-      <div className="p-4">
-        <label htmlFor={id} className="text-sm font-semibold">Drag to compare the photo and the X-ray</label>
-        <input id={id} type="range" min={0} max={100} value={pos} onChange={(e) => setPos(Number(e.target.value))} className="mt-2 w-full accent-accent" />
-        <p className="mt-3 text-sm leading-relaxed">
-          This mini-Schnauzer's owner was brushing the teeth twice daily and so the crowns are really nice and clean. However, the dog had never had a proper dental assessment, and there was widespread periodontal disease (massive bone loss evident on this radiograph). She required extraction of every tooth. Do not let clean crowns lull you into a false sense of security.
-        </p>
-        <p className="mt-2 break-words text-sm text-muted-foreground">
-          Image source: <a className="underline" href="https://vetdentedu.ca/2023/04/20/tooth-brushing-can-be-bad/" target="_blank" rel="noreferrer">https://vetdentedu.ca/2023/04/20/tooth-brushing-can-be-bad/</a>
-        </p>
-      </div>
-    </div>
-  );
-}
-
 const STAGES = [
-  { n: 1, name: "Gingivitis", tag: "Reversible", short: "Inflammation of the gums — redness, swelling and possible bleeding.",
-    more: "There is no attachment loss. This stage is reversible with proper professional dental cleaning and consistent oral home care." },
-  { n: 2, name: "Early periodontitis", tag: "Irreversible damage begins", short: "Inflammation has progressed under the gumline.",
-    more: "Less than 25% attachment loss. Early periodontal pockets are formed and mild bone loss may happen. Treatment includes scaling, polishing and subgingival scaling or locally applied antimicrobials." },
-  { n: 3, name: "Established periodontitis", tag: "Irreversible", short: "Significant damage to the supporting structures of the teeth.",
-    more: "25–50% attachment loss. There are deeper periodontal pockets, gingival recession, bone loss and possible tooth mobility." },
-  { n: 4, name: "Advanced periodontitis", tag: "Irreversible", short: "Severe destruction of the supporting tissues.",
-    more: "Greater than 50% periodontal attachment loss. Teeth may become extremely loose, and issues like infections and extensive bone loss may occur." },
+  {
+    n: 1, name: "Gingivitis", tag: "Reversible", short: "Inflammation of the gums — redness, swelling and possible bleeding.",
+    more: "There is no attachment loss. This stage is reversible with proper professional dental cleaning and consistent oral home care."
+  },
+  {
+    n: 2, name: "Early periodontitis", tag: "Irreversible damage begins", short: "Inflammation has progressed under the gumline.",
+    more: "Less than 25% attachment loss. Early periodontal pockets are formed and mild bone loss may happen. Treatment includes scaling, polishing and subgingival scaling or locally applied antimicrobials."
+  },
+  {
+    n: 3, name: "Established periodontitis", tag: "Irreversible", short: "Significant damage to the supporting structures of the teeth.",
+    more: "25–50% attachment loss. There are deeper periodontal pockets, gingival recession, bone loss and possible tooth mobility."
+  },
+  {
+    n: 4, name: "Advanced periodontitis", tag: "Irreversible", short: "Severe destruction of the supporting tissues.",
+    more: "Greater than 50% periodontal attachment loss. Teeth may become extremely loose, and issues like infections and extensive bone loss may occur."
+  },
 ];
 
 function StageCard({ s }: { s: (typeof STAGES)[number] }) {
@@ -182,7 +160,6 @@ const SOURCES = [
 const IMAGE_CREDITS = [
   ["Normal canine dental radiograph", "https://vetdentedu.ca/2023/01/02/normal-canine-dental-radiographs/"],
   ["Radiograph showing bone loss", "https://veterinarydentistry.net/periodontal-disease-dogs/"],
-  ["Mini-Schnauzer photo and radiograph", "https://vetdentedu.ca/2023/04/20/tooth-brushing-can-be-bad/"],
   ["Annotated outside vs. X-ray comparison", "https://yongesheppardvets.ca/anesthesia-free-vs-cohat/"],
   ["Toothbrushing a dog", "https://www.dahnc.com/articles/pet-dental-care-tips-to-manage-your-pets-oral-health"],
   ["7 key signs of dental disease", "https://mustcarevets.com.au/blogs/dental/spotting-trouble-early-7-signs-of-dental-disease-in-dogs/"],
@@ -221,7 +198,7 @@ function Index() {
               </a>
             </Reveal>
             <Reveal>
-              <img src={brushing.url} alt="A veterinary team member gently brushing a golden dog's teeth with a small toothbrush" className="w-full rounded-3xl shadow-soft" />
+              <img src={brushing} alt="A veterinary team member gently brushing a golden dog's teeth with a small toothbrush" className="mx-auto block h-auto w-auto max-w-full rounded-3xl shadow-soft" />
               <p className="mt-2 break-words text-xs text-muted-foreground">Image source: <a className="underline" href="https://www.dahnc.com/articles/pet-dental-care-tips-to-manage-your-pets-oral-health" target="_blank" rel="noreferrer">dahnc.com</a></p>
             </Reveal>
           </div>
@@ -250,20 +227,20 @@ function Index() {
           intro={<p>If you notice any of these signs, bring your pet to the vet. Remember: many problems sit below the gumline, so clean-looking teeth don't always mean a healthy mouth.</p>}>
           <div className="grid gap-8 md:grid-cols-2">
             <Reveal>
-              <Figure src={healthyTeeth.url} label="Healthy-looking teeth and gums" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
+              <Figure src={healthyTeeth} label="Healthy-looking teeth and gums" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
                 alt="Close-up of a dog's mouth after a professional dental cleaning, with clean scaled teeth and healthy pink gums">
                 The same mouth after a professional cleaning — clean teeth and healthy gums.
               </Figure>
             </Reveal>
             <Reveal>
-              <Figure src={tartarBuildup.url} label="Warning signs" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
+              <Figure src={tartarBuildup} label="Warning signs" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
                 alt="Close-up of a dog's mouth showing thick yellow-brown tartar on the teeth and red, inflamed gums">
                 Tartar buildup and red, inflamed gums.
               </Figure>
             </Reveal>
           </div>
           <Reveal className="mt-8">
-            <Figure src={warningSigns.url} credit="https://mustcarevets.com.au/blogs/dental/spotting-trouble-early-7-signs-of-dental-disease-in-dogs/"
+            <Figure src={warningSigns} credit="https://mustcarevets.com.au/blogs/dental/spotting-trouble-early-7-signs-of-dental-disease-in-dogs/"
               alt="Infographic of 7 key signs of dental disease: reluctance to chew or dropping food, red swollen or bleeding gums, persistent bad breath, pawing at the mouth, yellow or brown tartar, excessive drooling or blood, and loose or missing teeth">
               7 key signs: reluctance to chew or dropping food, red swollen or bleeding gums, persistent bad breath, pawing at the mouth, yellow or brown tartar, excessive drooling or blood, and loose or missing teeth.
             </Figure>
@@ -275,30 +252,34 @@ function Index() {
           </Reveal>
           <div className="mt-8 grid gap-8 md:grid-cols-2">
             <Reveal>
-              <Figure src={normalXray.url} label="Normal radiograph" credit="https://vetdentedu.ca/2023/01/02/normal-canine-dental-radiographs/"
+              <Figure src={normalXray} label="Normal radiograph" credit="https://vetdentedu.ca/2023/01/02/normal-canine-dental-radiographs/"
                 alt="Normal canine dental radiograph of the lower jaw with numbered teeth and bone surrounding the roots" />
             </Reveal>
             <Reveal>
-              <Figure src={boneLossXray.url} label="Bone loss" credit="https://veterinarydentistry.net/periodontal-disease-dogs/"
+              <Figure src={boneLossXray} label="Bone loss" credit="https://veterinarydentistry.net/periodontal-disease-dogs/"
                 alt="Dental radiograph showing a furcation defect and vertical bone loss around a lower premolar in a dog">
                 A furcation defect and vertical bone loss next to the left lower 4th premolar in a dog.
               </Figure>
             </Reveal>
           </div>
 
-          <Reveal className="mt-20 max-w-2xl">
-            <h3 className="text-2xl md:text-3xl">What you see vs. what an X-ray reveals</h3>
-            <p className="mt-3 leading-relaxed text-muted-foreground">Same dog, same teeth. Serious disease can hide below the gumline.</p>
-          </Reveal>
-          <div className="mt-8 grid gap-8 lg:grid-cols-[3fr_2fr]">
-            <Reveal><Compare /></Reveal>
-            <Reveal>
-              <Figure src={annotated.url} credit="https://yongesheppardvets.ca/anesthesia-free-vs-cohat/"
+          <section className="mt-20" aria-labelledby="comparison-heading">
+            <Reveal className="mx-auto max-w-2xl text-center">
+              <h3 id="comparison-heading" className="text-2xl md:text-3xl">
+                What you see vs. what an X-ray reveals
+              </h3>
+              <p className="mt-3 leading-relaxed text-muted-foreground">
+                Same dog, same teeth. Serious disease can hide below the gumline.
+              </p>
+            </Reveal>
+
+            <Reveal className="mx-auto mt-8 w-full">
+              <Figure src={annotated} credit="https://yongesheppardvets.ca/anesthesia-free-vs-cohat/"
                 alt="Side-by-side photo and X-ray of one dog, with red arrows marking teeth that needed extraction and lines showing where bone should be versus where it actually is">
                 Beautiful on the outside, severely diseased on the inside. Blue line = where the bone should be; red line = the actual bone level. Red arrows mark teeth that needed extraction.
               </Figure>
             </Reveal>
-          </div>
+          </section>
         </Section>
 
         <Section id="stages" eyebrow="How it progresses" title="The 4 stages of dental disease" tone="bg-muted"
@@ -325,7 +306,7 @@ function Index() {
               ))}
             </ol>
             <Reveal className="lg:sticky lg:top-24 lg:self-start">
-              <Figure src={catXray.url} credit="https://www.mcqueenanimalhospital.com/digital-dental-pet-radiography-brampton/"
+              <Figure src={catXray} credit="https://www.mcqueenanimalhospital.com/digital-dental-pet-radiography-brampton/"
                 alt="A calico cat under general anesthesia with a breathing tube, positioned for dental radiographs">
                 Dental radiographs are taken under general anesthesia.
               </Figure>
