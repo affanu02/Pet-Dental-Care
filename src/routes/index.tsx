@@ -8,6 +8,7 @@ import warningSigns from "@/assets/warning-signs.jpg";
 import tartarBuildup from "@/assets/tartar-buildup.jpg";
 import healthyTeeth from "@/assets/healthy-teeth.jpg";
 import catXray from "@/assets/cat-radiography.jpg";
+import { IMAGE_CREDITS, IMAGE_REFERENCES, SOURCES, type Reference } from "@/lib/references";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -80,7 +81,27 @@ function Section({ id, eyebrow, title, intro, children, tone = "" }: {
   );
 }
 
-function Figure({ src, alt, label, credit, children }: { src: string; alt: string; label?: string; credit: string; children?: ReactNode }) {
+function Citation({ reference }: { reference: Reference }) {
+  const { author, date, title, siteName, journal, url } = reference;
+
+  return (
+    <>
+      {author}{author.endsWith(".") ? "" : "."} ({date}).{" "}
+      {journal ? (
+        <>
+          {title}. <em>{journal.name}, {journal.volume}</em>({journal.issue}), {journal.pages}.{" "}
+        </>
+      ) : (
+        <>
+          <cite>{title}</cite>. {siteName && `${siteName}. `}
+        </>
+      )}
+      <a href={url} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-accent">{url}</a>
+    </>
+  );
+}
+
+function Figure({ src, alt, label, credit, children }: { src: string; alt: string; label?: string; credit: Reference; children?: ReactNode }) {
   return (
     <figure className="overflow-hidden rounded-2xl border bg-card shadow-soft">
       <div className="relative">
@@ -94,7 +115,7 @@ function Figure({ src, alt, label, credit, children }: { src: string; alt: strin
       <figcaption className="space-y-2 p-4 text-sm">
         {children && <div className="leading-relaxed text-foreground">{children}</div>}
         <p className="break-words text-muted-foreground">
-          Image source: <a className="underline underline-offset-2 hover:text-accent" href={credit} target="_blank" rel="noreferrer">{credit}</a>
+          Image source: <Citation reference={credit} />
         </p>
       </figcaption>
     </figure>
@@ -149,24 +170,6 @@ const STEPS = [
   ["Home-care instructions", "You receive instructions on maintaining your pet's oral health with regular toothbrushing, dental products, or preventative care."],
 ];
 
-const SOURCES = [
-  "https://vetster.com/en/wellness/why-dental-hygiene-and-oral-health-are-important-for-pets",
-  "https://veterinarypartner.vin.com/default.aspx?pid=19239&id=4951294",
-  "https://vetmed.tamu.edu/news/pet-talk/why-pet-dental-care-is-important/",
-  "https://leovets.ca/blog/home-dental-care-for-dogs-cats-building-habits-that-last-a-lifetime/",
-  "https://www.greencrossvets.com.au/pet-library/articles-of-interest/dental-home-care/",
-  "https://vohc.org/history/",
-];
-const IMAGE_CREDITS = [
-  ["Normal canine dental radiograph", "https://vetdentedu.ca/2023/01/02/normal-canine-dental-radiographs/"],
-  ["Radiograph showing bone loss", "https://veterinarydentistry.net/periodontal-disease-dogs/"],
-  ["Annotated outside vs. X-ray comparison", "https://yongesheppardvets.ca/anesthesia-free-vs-cohat/"],
-  ["Toothbrushing a dog", "https://www.dahnc.com/articles/pet-dental-care-tips-to-manage-your-pets-oral-health"],
-  ["7 key signs of dental disease", "https://mustcarevets.com.au/blogs/dental/spotting-trouble-early-7-signs-of-dental-disease-in-dogs/"],
-  ["Tartar and inflamed gums", "https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"],
-  ["Cat having dental radiographs", "https://www.mcqueenanimalhospital.com/digital-dental-pet-radiography-brampton/"],
-];
-
 function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -199,7 +202,7 @@ function Index() {
             </Reveal>
             <Reveal>
               <img src={brushing} alt="A veterinary team member gently brushing a golden dog's teeth with a small toothbrush" className="mx-auto block h-auto w-auto max-w-full rounded-3xl shadow-soft" />
-              <p className="mt-2 break-words text-xs text-muted-foreground">Image source: <a className="underline" href="https://www.dahnc.com/articles/pet-dental-care-tips-to-manage-your-pets-oral-health" target="_blank" rel="noreferrer">dahnc.com</a></p>
+              <p className="mt-2 break-words text-xs text-muted-foreground">Image source: <Citation reference={IMAGE_CREDITS.brushing} /></p>
             </Reveal>
           </div>
         </section>
@@ -227,20 +230,20 @@ function Index() {
           intro={<p>If you notice any of these signs, bring your pet to the vet. Remember: many problems sit below the gumline, so clean-looking teeth don't always mean a healthy mouth.</p>}>
           <div className="grid gap-8 md:grid-cols-2">
             <Reveal>
-              <Figure src={healthyTeeth} label="Healthy-looking teeth and gums" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
+              <Figure src={healthyTeeth} label="Healthy-looking teeth and gums" credit={IMAGE_CREDITS.teeth}
                 alt="Close-up of a dog's mouth after a professional dental cleaning, with clean scaled teeth and healthy pink gums">
                 The same mouth after a professional cleaning — clean teeth and healthy gums.
               </Figure>
             </Reveal>
             <Reveal>
-              <Figure src={tartarBuildup} label="Warning signs" credit="https://www.northpointpets.com/howyourpetsdentalhealthimpactstheentirebody/"
+              <Figure src={tartarBuildup} label="Warning signs" credit={IMAGE_CREDITS.teeth}
                 alt="Close-up of a dog's mouth showing thick yellow-brown tartar on the teeth and red, inflamed gums">
                 Tartar buildup and red, inflamed gums.
               </Figure>
             </Reveal>
           </div>
           <Reveal className="mt-8">
-            <Figure src={warningSigns} credit="https://mustcarevets.com.au/blogs/dental/spotting-trouble-early-7-signs-of-dental-disease-in-dogs/"
+            <Figure src={warningSigns} credit={IMAGE_CREDITS.warningSigns}
               alt="Infographic of 7 key signs of dental disease: reluctance to chew or dropping food, red swollen or bleeding gums, persistent bad breath, pawing at the mouth, yellow or brown tartar, excessive drooling or blood, and loose or missing teeth">
               7 key signs: reluctance to chew or dropping food, red swollen or bleeding gums, persistent bad breath, pawing at the mouth, yellow or brown tartar, excessive drooling or blood, and loose or missing teeth.
             </Figure>
@@ -252,11 +255,11 @@ function Index() {
           </Reveal>
           <div className="mt-8 grid gap-8 md:grid-cols-2">
             <Reveal>
-              <Figure src={normalXray} label="Normal radiograph" credit="https://vetdentedu.ca/2023/01/02/normal-canine-dental-radiographs/"
+              <Figure src={normalXray} label="Normal radiograph" credit={IMAGE_CREDITS.normalXray}
                 alt="Normal canine dental radiograph of the lower jaw with numbered teeth and bone surrounding the roots" />
             </Reveal>
             <Reveal>
-              <Figure src={boneLossXray} label="Bone loss" credit="https://veterinarydentistry.net/periodontal-disease-dogs/"
+              <Figure src={boneLossXray} label="Bone loss" credit={IMAGE_CREDITS.boneLossXray}
                 alt="Dental radiograph showing a furcation defect and vertical bone loss around a lower premolar in a dog">
                 A furcation defect and vertical bone loss next to the left lower 4th premolar in a dog.
               </Figure>
@@ -274,7 +277,7 @@ function Index() {
             </Reveal>
 
             <Reveal className="mx-auto mt-8 w-full">
-              <Figure src={annotated} credit="https://yongesheppardvets.ca/anesthesia-free-vs-cohat/"
+              <Figure src={annotated} credit={IMAGE_CREDITS.annotated}
                 alt="Side-by-side photo and X-ray of one dog, with red arrows marking teeth that needed extraction and lines showing where bone should be versus where it actually is">
                 Beautiful on the outside, severely diseased on the inside. Blue line = where the bone should be; red line = the actual bone level. Red arrows mark teeth that needed extraction.
               </Figure>
@@ -306,7 +309,7 @@ function Index() {
               ))}
             </ol>
             <Reveal className="lg:sticky lg:top-24 lg:self-start">
-              <Figure src={catXray} credit="https://www.mcqueenanimalhospital.com/digital-dental-pet-radiography-brampton/"
+              <Figure src={catXray} credit={IMAGE_CREDITS.catXray}
                 alt="A calico cat under general anesthesia with a breathing tube, positioned for dental radiographs">
                 Dental radiographs are taken under general anesthesia.
               </Figure>
@@ -351,15 +354,18 @@ function Index() {
           <div className="grid gap-10 md:grid-cols-2">
             <div>
               <h3 className="text-xl">Sources</h3>
-              <ul className="mt-4 space-y-2 text-sm">
-                {SOURCES.map((s) => <li key={s} className="break-words"><a href={s} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-accent">{s}</a></li>)}
-                <li>AAHA (2019). Dental Care Guidelines for Dogs and Cats.</li>
+              <ul className="mt-4 space-y-4 text-sm leading-relaxed">
+                {SOURCES.map((reference) => (
+                  <li key={reference.url} className="break-words pl-8 -indent-8"><Citation reference={reference} /></li>
+                ))}
               </ul>
             </div>
             <div>
               <h3 className="text-xl">Image credits</h3>
-              <ul className="mt-4 space-y-2 text-sm">
-                {IMAGE_CREDITS.map(([t, u]) => <li key={u} className="break-words"><span className="font-semibold">{t}:</span> <a href={u} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-accent">{u}</a></li>)}
+              <ul className="mt-4 space-y-4 text-sm leading-relaxed">
+                {IMAGE_REFERENCES.map((reference) => (
+                  <li key={reference.url} className="break-words pl-8 -indent-8"><Citation reference={reference} /></li>
+                ))}
               </ul>
             </div>
           </div>
